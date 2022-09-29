@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/orisano/gomasio"
+	"github.com/snap-one/fork-go-gomasio"
 )
 
 type Handler interface {

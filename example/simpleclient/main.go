@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/orisano/gomasio"
-	"github.com/orisano/gomasio/engineio"
-	"github.com/orisano/gomasio/socketio"
+	"github.com/snap-one/fork-go-gomasio"
+	"github.com/snap-one/fork-go-gomasio/engineio"
+	"github.com/snap-one/fork-go-gomasio/socketio"
 )
 
 func run() error {

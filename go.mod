@@ -1,4 +1,4 @@
-module github.com/orisano/gomasio
+module github.com/snap-one/fork-go-gomasio
 
 go 1.14
 

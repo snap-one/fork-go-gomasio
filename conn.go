@@ -100,7 +100,9 @@ func (c *conn) NextReader() (io.Reader, error) {
 	if mt != websocket.TextMessage {
 		return nil, fmt.Errorf("currently supports only text message: %v", mt)
 	}
-	return r, nil
+	buf := bytes.Buffer{}
+	buf.ReadFrom(r)
+	return &buf, nil
 }
 
 func (c *conn) NewWriter() WriteFlusher {

@@ -4,8 +4,8 @@ import (
 	stdctx "context"
 	"io"
 
-	"github.com/orisano/gomasio"
-	"github.com/orisano/gomasio/engineio"
+	"github.com/snap-one/fork-go-gomasio"
+	"github.com/snap-one/fork-go-gomasio/engineio"
 )
 
 type Handler interface {

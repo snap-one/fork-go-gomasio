@@ -1,7 +1,7 @@
 package engineio
 
 import (
-	"github.com/orisano/gomasio"
+	"github.com/snap-one/fork-go-gomasio"
 )
 
 func NewWriter(wf gomasio.WriteFlusher, packetType PacketType) gomasio.WriteFlusher {
