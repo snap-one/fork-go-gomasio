@@ -6,15 +6,15 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
+	"github.com/snap-one/fork-go-gomasio/engineio"
+	"github.com/snap-one/fork-go-gomasio/socketio"
 	"log"
 	"time"
 
 	"github.com/orisano/go-retry"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/orisano/gomasio"
-	"github.com/orisano/gomasio/engineio"
-	"github.com/orisano/gomasio/socketio"
+	"github.com/snap-one/fork-go-gomasio"
 )
 
 func run() error {

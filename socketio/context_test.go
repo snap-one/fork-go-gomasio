@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/orisano/gomasio"
+	"github.com/snap-one/fork-go-gomasio"
 )
 
 type testWriterFactory struct {
