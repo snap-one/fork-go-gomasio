@@ -26,8 +26,9 @@ type Conn interface {
 
 // ref: https://godoc.org/github.com/gorilla/websocket#hdr-Concurrency
 type conn struct {
-	ws  *websocket.Conn
-	wch chan io.Reader
+	ws      *websocket.Conn
+	wch     chan io.Reader
+	closing chan struct{}
 }
 
 type ConnOptions struct {
@@ -73,22 +74,29 @@ func NewConn(urlStr string, opts ...ConnOption) (Conn, error) {
 		return nil, err
 	}
 
+	closing := make(chan struct{})
 	wch := make(chan io.Reader, options.QueueSize)
 	go func() {
-		for r := range wch {
-			wc, err := ws.NextWriter(websocket.TextMessage)
-			if err != nil {
-				continue
+		for {
+			select {
+			case <-closing:
+				return
+			case r := <-wch:
+				wc, err := ws.NextWriter(websocket.TextMessage)
+				if err != nil {
+					continue
+				}
+				if _, err := io.Copy(wc, r); err != nil {
+					continue
+				}
+				wc.Close()
 			}
-			if _, err := io.Copy(wc, r); err != nil {
-				continue
-			}
-			wc.Close()
 		}
 	}()
 	return &conn{
-		ws:  ws,
-		wch: wch,
+		ws:      ws,
+		wch:     wch,
+		closing: closing,
 	}, nil
 }
 
@@ -106,17 +114,18 @@ func (c *conn) NextReader() (io.Reader, error) {
 }
 
 func (c *conn) NewWriter() WriteFlusher {
-	return &asyncWriter{q: c.wch, buf: &bytes.Buffer{}}
+	return &asyncWriter{q: c.wch, closing: c.closing, buf: &bytes.Buffer{}}
 }
 
 func (c *conn) Close() error {
-	close(c.wch)
+	close(c.closing)
 	return c.ws.Close()
 }
 
 type asyncWriter struct {
-	q   chan<- io.Reader
-	buf *bytes.Buffer
+	q       chan<- io.Reader
+	closing <-chan struct{}
+	buf     *bytes.Buffer
 }
 
 func (w *asyncWriter) Write(p []byte) (n int, err error) {
@@ -124,7 +133,16 @@ func (w *asyncWriter) Write(p []byte) (n int, err error) {
 }
 
 func (w *asyncWriter) Flush() error {
-	w.q <- w.buf
+	select {
+	case <-w.closing:
+		return nil
+	default:
+	}
+
+	select {
+	case <-w.closing:
+	case w.q <- w.buf:
+	}
 	return nil
 }
 
